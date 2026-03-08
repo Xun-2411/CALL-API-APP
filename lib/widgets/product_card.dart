@@ -11,24 +11,30 @@ class ProductCard extends StatelessWidget {
     return Card(
       margin: EdgeInsets.zero,
       child: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(4.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
-              child: Image.network(
-                product.image,
-                height: 120,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => const Icon(Icons.image_not_supported, size: 120),
+            Container(
+              height: 80,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.grey[200],
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8.0),
+                child: Image.network(
+                  product.image,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) => const Icon(Icons.image_not_supported, size: 40),
+                ),
               ),
             ),
             const SizedBox(height: 8),
             Text(
               product.title,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
@@ -36,17 +42,18 @@ class ProductCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               '\$${product.price.toStringAsFixed(2)}',
-              style: const TextStyle(fontSize: 14, color: Colors.green, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 12, color: Colors.green, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 4),
             Text(
               product.description,
-              style: const TextStyle(fontSize: 12),
+              style: const TextStyle(fontSize: 10),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
             ),
+            const SizedBox(height: 8),
           ],
         ),
       ),

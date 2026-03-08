@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -12,45 +12,38 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _auth = FirebaseAuth.instance;
   bool _isLoading = false;
 
   Future<void> _login() async {
     setState(() => _isLoading = true);
-    try {
-      await _auth.signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
+    final prefs = await SharedPreferences.getInstance();
+    final storedEmail = prefs.getString('email');
+    final storedPassword = prefs.getString('password');
+
+    if (storedEmail == _emailController.text.trim() &&
+        storedPassword == _passwordController.text.trim()) {
+      await prefs.setBool('isLoggedIn', true);
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const HomeScreen()),
       );
-    } on FirebaseAuthException catch (e) {
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message ?? 'Login failed')),
+        const SnackBar(content: Text('Invalid email or password')),
       );
-    } finally {
-      setState(() => _isLoading = false);
     }
+    setState(() => _isLoading = false);
   }
 
   Future<void> _register() async {
     setState(() => _isLoading = true);
-    try {
-      await _auth.createUserWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
-      );
-    } on FirebaseAuthException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message ?? 'Registration failed')),
-      );
-    } finally {
-      setState(() => _isLoading = false);
-    }
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('email', _emailController.text.trim());
+    await prefs.setString('password', _passwordController.text.trim());
+    await prefs.setBool('isLoggedIn', true);
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => const HomeScreen()),
+    );
+    setState(() => _isLoading = false);
   }
 
   @override
